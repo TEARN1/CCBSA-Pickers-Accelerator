@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCBSA Picking Accelerator - Advanced</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
+        .coke-red { background-color: #F40009; }
+        .coke-red-text { color: #F40009; }
+        .glass-morphism {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .product-image {
+            height: 160px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+        }
+        .category-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .category-card:active { transform: scale(0.95); }
+        .timer-bar { transition: width 0.1s linear; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        const PRODUCT_DATA = [
+            // 2000 ML
+            { id: 1, name: "COKE 2000 SHR", code: "1040", category: "2.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2l.png", casesPerPallet: 80 },
+            { id: 2, name: "FANTA ORANGE 2000 SHR", code: "3040", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-2l.png", casesPerPallet: 80 },
+            { id: 3, name: "SPRITE 2000 SHR", code: "5177", category: "2.0L PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-2l.png", casesPerPallet: 80 },
+
+            // 2250 ML
+            { id: 5, name: "COKE 2250 SHR", code: "1263", category: "2.25L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2.25l.png", casesPerPallet: 64 },
+
+            // 1000 ML
+            { id: 8, name: "1000ml Coke", code: "1091", category: "1.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1l.png", casesPerPallet: 75 },
+
+            // 440ML
+            { id: 10, name: "COKE 440 PET", code: "7579", category: "440ml PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-440ml.png", casesPerPallet: 84 },
+
+            // Cans
+            { id: 12, name: "COKE 300 CAN", code: "7638", category: "Cans", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-300ml.png", casesPerPallet: 143 }
+        ];
+
+        const CATEGORIES = ["All Products", "2.0L PET", "2.25L PET", "1.0L PET", "440ml PET", "Cans"];
+
+        const App = () => {
+            const [view, setView] = useState('menu');
+            const [gameMode, setGameMode] = useState(null);
+            const [selectedCategory, setSelectedCategory] = useState(null);
+            const [score, setScore] = useState(0);
+            const [totalAttempted, setTotalAttempted] = useState(0);
+
+            const selectMode = (mode) => {
+                setGameMode(mode);
+                setView('selectCategory');
+            };
+
+            const startGame = (category) => {
+                setSelectedCategory(category);
+                setScore(0);
+                setTotalAttempted(0);
+                setView(gameMode);
+            };
+
+            const finishGame = () => setView('results');
+            const goMenu = () => setView('menu');
+            const showAbout = () => setView('about');
+
+            return (
+                <div className="min-h-screen flex flex-col items-center p-4">
+                    <header className="w-full max-w-md p-6 flex justify-between items-center z-10">
+                        <div className="font-extrabold text-2xl tracking-tighter flex items-center gap-2">
+                            <div className="w-8 h-8 coke-red rounded flex items-center justify-center text-xs">CC</div>
+                            <span>ACCELERATOR</span>
+                        </div>
+                        {view !== 'menu' && (
+                            <button onClick={goMenu} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                                <i className="fas fa-home"></i>
+                            </button>
+                        )}
+                    </header>
+
+                    <main className="w-full max-w-md mt-4 flex-1">
+                        {view === 'menu' && <Menu onSelectMode={selectMode} onShowAbout={showAbout} />}
+                        {view === 'about' && <About onBack={goMenu} />}
+                        {view === 'selectCategory' && <CategorySelect onSelectCategory={startGame} />}
+                        {(view === 'recognition' || view === 'mastery' || view === 'pallet') && (
+                            <Game
+                                type={view}
+                                category={selectedCategory}
+                                onFinish={finishGame}
+                                setScore={setScore}
+                                score={score}
+                                setTotal={setTotalAttempted}
+                                total={totalAttempted}
+                            />
+                        )}
+                        {view === 'results' && (
+                            <Results
+                                score={score}
+                                total={totalAttempted}
+                                onRestart={() => startGame(selectedCategory)}
+                                onMenu={goMenu}
+                            />
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        const Menu = ({ onSelectMode, onShowAbout }) => (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-10">
+                <div className="text-center mb-10">
+                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">Picking HQ</h1>
+                    <p className="text-slate-400 font-medium">Efficiency & Accuracy Modules</p>
+                </div>
+
+                <div className="grid gap-4">
+                    <button onClick={() => onSelectMode('recognition')} className="glass-morphism p-5 rounded-3xl text-left hover:border-red-500/50 transition-all flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-500 flex items-center justify-center text-xl"><i className="fas fa-eye"></i></div>
+                        <div><h3 className="font-bold">Visual Recognition</h3><p className="text-xs text-slate-400">Identify SKU by brand & size</p></div>
+                    </button>
+
+                    <button onClick={() => onSelectMode('mastery')} className="glass-morphism p-5 rounded-3xl text-left hover:border-blue-500/50 transition-all flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center text-xl"><i className="fas fa-brain"></i></div>
+                        <div><h3 className="font-bold">Material Mastery</h3><p className="text-xs text-slate-400">Match names to 4-digit codes</p></div>
+                    </button>
+
+                    <button onClick={() => onSelectMode('pallet')} className="glass-morphism p-5 rounded-3xl text-left hover:border-green-500/50 transition-all flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-green-500/20 text-green-500 flex items-center justify-center text-xl"><i className="fas fa-calculator"></i></div>
+                        <div><h3 className="font-bold">Pallet Logic</h3><p className="text-xs text-slate-400">Calculate case/pallet counts</p></div>
+                    </button>
+                </div>
+
+                <button onClick={onShowAbout} className="w-full mt-8 flex items-center justify-center gap-2 text-slate-500 hover:text-white transition-colors">
+                    <i className="fas fa-info-circle"></i>
+                    <span className="text-sm font-bold uppercase tracking-widest">Project Intel</span>
+                </button>
+            </div>
+        );
+
+        const About = ({ onBack }) => (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+                <div className="glass-morphism p-8 rounded-[2.5rem] border-slate-700">
+                    <h2 className="text-2xl font-black mb-4 flex items-center gap-2">
+                        <i className="fas fa-shield-alt text-red-500"></i>
+                        MISSION OBJECTIVE
+                    </h2>
+                    <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                        The **CCBSA Picking Accelerator** is a high-velocity training engine engineered to optimize the human nodes in our supply chain.
+                        By eliminating SKU substitution errors at the source and slashing onboarding time, we turn every picker into a high-precision efficiency asset.
+                    </p>
+
+                    <div className="space-y-4">
+                        <div className="flex gap-4">
+                            <div className="text-red-500 mt-1"><i className="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4 className="font-bold text-sm">Visual Muscle Memory</h4>
+                                <p className="text-xs text-slate-500">Train the eye to instantly distinguish between 2L and 2.25L variants.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="text-blue-500 mt-1"><i className="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4 className="font-bold text-sm">Code Internalization</h4>
+                                <p className="text-xs text-slate-500">Eliminate the need for cheat sheets by memorizing material codes (e.g. 1040, 1091).</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="text-green-500 mt-1"><i className="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4 className="font-bold text-sm">Pallet Intelligence</h4>
+                                <p className="text-xs text-slate-500">Master full pallet quantities to accelerate loading and inventory verification.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onClick={onBack} className="w-full bg-slate-800 p-5 rounded-3xl font-bold text-lg border border-slate-700 hover:bg-slate-700 transition-all">
+                    RETURN TO HQ
+                </button>
+            </div>
+        );
+
+        const CategorySelect = ({ onSelectCategory }) => (
+            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <h2 className="text-2xl font-black mb-6">Select Zone</h2>
+                <div className="grid grid-cols-2 gap-3">
+                    {CATEGORIES.map((cat) => (
+                        <button key={cat} onClick={() => onSelectCategory(cat)} className="glass-morphism p-4 rounded-2xl text-left hover:bg-slate-700/50 transition-colors">
+                            <span className="font-bold text-sm leading-tight">{cat}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const Game = ({ type, category, onFinish, setScore, score, setTotal, total }) => {
+            const filteredData = useMemo(() => {
+                if (category === "All Products") return PRODUCT_DATA;
+                return PRODUCT_DATA.filter(p => p.category === category);
+            }, [category]);
+
+            const [currentQ, setCurrentQ] = useState(null);
+            const [options, setOptions] = useState([]);
+            const [timeLeft, setTimeLeft] = useState(100);
+            const [isAnswering, setIsAnswering] = useState(false);
+            const [feedback, setFeedback] = useState(null);
+
+            const generateQuestion = () => {
+                const correct = filteredData[Math.floor(Math.random() * filteredData.length)];
+                let choices = [];
+
+                if (type === 'pallet') {
+                    const cases = [correct.casesPerPallet, correct.casesPerPallet / 2, correct.casesPerPallet + 20, correct.casesPerPallet - 15].sort(() => Math.random() - 0.5);
+                    choices = cases.map(c => ({ id: Math.random(), val: Math.round(c), isCorrect: Math.round(c) === correct.casesPerPallet }));
+                } else {
+                    choices = [correct];
+                    while (choices.length < 4) {
+                        const random = PRODUCT_DATA[Math.floor(Math.random() * PRODUCT_DATA.length)];
+                        if (!choices.find(c => c.id === random.id)) choices.push(random);
+                    }
+                    choices = choices.sort(() => Math.random() - 0.5);
+                }
+
+                setCurrentQ(correct);
+                setOptions(choices);
+                setFeedback(null);
+                setIsAnswering(false);
+                setTimeLeft(100);
+            };
+
+            useEffect(() => { generateQuestion(); }, []);
+
+            useEffect(() => {
+                if (timeLeft > 0 && !isAnswering) {
+                    const timer = setTimeout(() => setTimeLeft(prev => prev - (type === 'pallet' ? 1.5 : 2.5)), 100);
+                    return () => clearTimeout(timer);
+                } else if (timeLeft <= 0) { handleAnswer(null); }
+            }, [timeLeft, isAnswering]);
+
+            const handleAnswer = (choice) => {
+                if (isAnswering) return;
+                setIsAnswering(true);
+                setTotal(prev => prev + 1);
+
+                const isCorrect = type === 'pallet' ? (choice && choice.isCorrect) : (choice && choice.id === currentQ.id);
+                if (isCorrect) { setScore(prev => prev + 1); setFeedback('correct'); }
+                else { setFeedback('wrong'); }
+
+                setTimeout(() => { if (total + 1 >= 10) onFinish(); else generateQuestion(); }, 800);
+            };
+
+            if (!currentQ) return null;
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center px-2">
+                        <span className="text-xs font-bold text-slate-500 tracking-widest">{total + 1} / 10</span>
+                        <span className="text-xl font-black text-red-500">{score}</span>
+                    </div>
+
+                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div className={`h-full timer-bar ${timeLeft < 30 ? 'bg-red-500' : 'bg-green-500'}`} style={{ width: `${timeLeft}%` }}></div>
+                    </div>
+
+                    <div className={`glass-morphism p-8 rounded-[2.5rem] text-center border-2 flex flex-col items-center justify-center min-h-[300px] ${
+                        feedback === 'correct' ? 'border-green-500/50 bg-green-500/5' : feedback === 'wrong' ? 'border-red-500/50 bg-red-500/5' : 'border-slate-700'
+                    }`}>
+                        {type === 'recognition' && <img src={currentQ.image} className="product-image mb-4" />}
+                        {type === 'mastery' && <h2 className="text-3xl font-black">{currentQ.name}</h2>}
+                        {type === 'pallet' && (
+                            <div className="space-y-2">
+                                <h2 className="text-2xl font-black text-slate-400 uppercase tracking-tighter">Full Pallet Qty:</h2>
+                                <h2 className="text-4xl font-black text-white">{currentQ.name}</h2>
+                            </div>
+                        )}
+                        <p className="mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                            {type === 'pallet' ? "Select Cases Per Pallet" : `Match the ${type === 'recognition' ? 'Product' : 'Code'}`}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        {options.map((opt, i) => (
+                            <button key={i} onClick={() => handleAnswer(opt)} className={`p-4 rounded-2xl font-black text-sm border transition-all min-h-[70px] ${
+                                isAnswering && (type === 'pallet' ? opt.isCorrect : opt.id === currentQ.id) ? 'bg-green-500 border-green-400' :
+                                isAnswering && feedback === 'wrong' ? 'bg-slate-800 opacity-50 border-slate-700' : 'bg-slate-800 border-slate-700 active:bg-slate-700'
+                            }`}>
+                                {type === 'pallet' ? opt.val : (type === 'recognition' ? opt.name : opt.code)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const Results = ({ score, total, onRestart, onMenu }) => {
+            const percentage = Math.round((score / total) * 100);
+            return (
+                <div className="text-center space-y-6 animate-in zoom-in duration-300">
+                    <div className="p-10 glass-morphism rounded-[3rem] border-slate-700">
+                        <div className="text-6xl font-black mb-2 text-red-500">{percentage}%</div>
+                        <h2 className="text-xl font-black mb-6 uppercase tracking-tight">{percentage === 100 ? "Master" : "Trainee"}</h2>
+                        <div className="grid grid-cols-2 gap-4 border-t border-slate-700 pt-6">
+                            <div><p className="text-[10px] font-bold text-slate-500 uppercase">Picked</p><p className="text-xl font-bold">{score}</p></div>
+                            <div><p className="text-[10px] font-bold text-slate-500 uppercase">Target</p><p className="text-xl font-bold">{total}</p></div>
+                        </div>
+                    </div>
+                    <button onClick={onRestart} className="w-full coke-red p-5 rounded-3xl font-black text-lg">RESTART DRILL</button>
+                    <button onClick={onMenu} className="w-full bg-slate-800 p-5 rounded-3xl font-bold text-lg">DASHBOARD</button>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
