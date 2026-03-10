@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCBSA Picking Accelerator - Advanced</title>
+    <title>CCBSA Picking Accelerator - ULTRA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -11,7 +11,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
         .coke-red { background-color: #F40009; }
         .coke-red-text { color: #F40009; }
         .glass-morphism {
@@ -24,49 +24,121 @@
             object-fit: contain;
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
         }
-        .category-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .category-card:active { transform: scale(0.95); }
         .timer-bar { transition: width 0.1s linear; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .animate-pulse-green { animation: pulse-green 0.5s ease-out; }
+
+        .landing-gradient {
+            background: radial-gradient(circle at top right, rgba(244, 0, 9, 0.15), transparent),
+                        radial-gradient(circle at bottom left, rgba(30, 41, 59, 1), transparent);
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
         const PRODUCT_DATA = [
-            // 2000 ML
-            { id: 1, name: "COKE 2000 SHR", code: "1040", category: "2.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2l.png", casesPerPallet: 80 },
-            { id: 2, name: "FANTA ORANGE 2000 SHR", code: "3040", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-2l.png", casesPerPallet: 80 },
-            { id: 3, name: "SPRITE 2000 SHR", code: "5177", category: "2.0L PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-2l.png", casesPerPallet: 80 },
+            // 2000 ML (2L) - CPP: 80, CPL: 20
+            { id: 1, name: "COKE 2000 SHR", code: "1040", category: "2.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2l.png", cpp: 80, cpl: 20 },
+            { id: 2, name: "FANTA ORANGE 2000 SHR", code: "3040", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-2l.png", cpp: 80, cpl: 20 },
+            { id: 3, name: "FANTA GRAPE 2000 SHR", code: "3240", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-grape-2l.png", cpp: 80, cpl: 20 },
+            { id: 4, name: "FANTA PINE 2000 SHR", code: "4755", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-pineapple-2l.png", cpp: 80, cpl: 20 },
+            { id: 5, name: "SPRITE 2000 SHR", code: "5177", category: "2.0L PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-2l.png", cpp: 80, cpl: 20 },
+            { id: 6, name: "TWIST LEMON 2000 SHR", code: "5740", category: "2.0L PET", brand: "Lemon Twist", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/lemon-twist/lemon-twist-2l.png", cpp: 80, cpl: 20 },
+            { id: 7, name: "SPARL CREM SODA 2000 SHR", code: "6040", category: "2.0L PET", brand: "Sparletta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sparletta/sparletta-cream-soda-2l.png", cpp: 80, cpl: 20 },
+            { id: 8, name: "SPARL SPARBERRY 2000 SHR", code: "6141", category: "2.0L PET", brand: "Sparletta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sparletta/sparletta-sparberry-2l.png", cpp: 80, cpl: 20 },
+            { id: 9, name: "STONEY 2000 SHR", code: "6540", category: "2.0L PET", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-2l.png", cpp: 80, cpl: 20 },
 
-            // 2250 ML
-            { id: 5, name: "COKE 2250 SHR", code: "1263", category: "2.25L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2.25l.png", casesPerPallet: 64 },
+            // 2250 ML (2.25L) - CPP: 64, CPL: 16
+            { id: 10, name: "COKE 2250 SHR", code: "1263", category: "2.25L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2.25l.png", cpp: 64, cpl: 16 },
+            { id: 11, name: "COKE NO SUGAR 2250 SHR", code: "5954", category: "2.25L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-2.25l.png", cpp: 64, cpl: 16 },
+            { id: 12, name: "SPRITE NO SUGAR 2250 SHR", code: "2263", category: "2.25L PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-no-sugar-2.25l.png", cpp: 64, cpl: 16 },
+            { id: 13, name: "FANTA NO SUGAR 2250 SHR", code: "2754", category: "2.25L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-no-sugar-2.25l.png", cpp: 64, cpl: 16 },
 
-            // 1000 ML
-            { id: 8, name: "1000ml Coke", code: "1091", category: "1.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1l.png", casesPerPallet: 75 },
+            // 1000 ML (1L) - CPP: 75, CPL: 15
+            { id: 14, name: "1000ml Coke", code: "1091", category: "1.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1l.png", cpp: 75, cpl: 15 },
+            { id: 15, name: "1000ml Coke Zero", code: "1574", category: "1.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-1l.png", cpp: 75, cpl: 15 },
+            { id: 16, name: "1000ml Fanta Orange", code: "3091", category: "1.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-1l.png", cpp: 75, cpl: 15 },
+            { id: 17, name: "1000ml Stoney", code: "6591", category: "1.0L PET", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-1l.png", cpp: 75, cpl: 15 },
 
-            // 440ML
-            { id: 10, name: "COKE 440 PET", code: "7579", category: "440ml PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-440ml.png", casesPerPallet: 84 },
+            // 1.5L - CPP: 55, CPL: 11
+            { id: 18, name: "COKE 1500 SHR", code: "1759", category: "1.5L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1.5l.png", cpp: 55, cpl: 11 },
+            { id: 19, name: "COKE ZERO 1500 SHR", code: "1599", category: "1.5L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-1.5l.png", cpp: 55, cpl: 11 },
+            { id: 20, name: "FANTA ORANGE 1500 SHR", code: "3174", category: "1.5L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-1.5l.png", cpp: 55, cpl: 11 },
+            { id: 21, name: "STONEY 1500 SHR", code: "6588", category: "1.5L PET", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-1.5l.png", cpp: 55, cpl: 11 },
 
-            // Cans
-            { id: 12, name: "COKE 300 CAN", code: "7638", category: "Cans", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-300ml.png", casesPerPallet: 143 }
+            // 440ML PET - CPP: 84, CPL: 12
+            { id: 22, name: "COKE 440 PET", code: "7579", category: "440ml PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-440ml.png", cpp: 84, cpl: 12 },
+            { id: 23, name: "COKE ZERO 440 PET", code: "7583", category: "440ml PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-440ml.png", cpp: 84, cpl: 12 },
+            { id: 24, name: "SPRITE 440 PET", code: "7947", category: "440ml PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-440ml.png", cpp: 84, cpl: 12 },
+            { id: 25, name: "FANTA ORANGE 440 PET", code: "6207", category: "440ml PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-440ml.png", cpp: 84, cpl: 12 },
+            { id: 26, name: "STONEY 440 PET", code: "6891", category: "440ml PET", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-440ml.png", cpp: 84, cpl: 12 },
+
+            // Cans 300ml - CPP: 143, CPL: 13
+            { id: 27, name: "COKE 300 CAN", code: "7638", category: "Cans", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-300ml.png", cpp: 143, cpl: 13 },
+            { id: 28, name: "FANTA ORANGE 300 CAN", code: "7713", category: "Cans", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-300ml.png", cpp: 143, cpl: 13 },
+            { id: 29, name: "SPRITE 300 CAN", code: "7757", category: "Cans", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-300ml.png", cpp: 143, cpl: 13 },
+            { id: 30, name: "STONEY 300 CAN", code: "7797", category: "Cans", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-300ml.png", cpp: 143, cpl: 13 },
+
+            // Energy - CPP: 80, CPL: 10
+            { id: 31, name: "MONSTER ORIGINAL 500 CAN", code: "6863", category: "Energy", brand: "Monster", image: "https://brand.monsterenergy.com/media/products/packshot/za_monster_original.png", cpp: 80, cpl: 10 },
+            { id: 32, name: "MONSTER ULTRA 500 CAN", code: "4996", category: "Energy", brand: "Monster", image: "https://brand.monsterenergy.com/media/products/packshot/za_monster_ultra.png", cpp: 80, cpl: 10 },
+            { id: 33, name: "PLAY ORIGINAL LS 440 CAN", code: "6644", category: "Energy", brand: "Powerplay", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/powerplay/powerplay-original-440ml.png", cpp: 90, cpl: 10 },
+            { id: 34, name: "PREDATOR GOLD 500 CAN", code: "5682", category: "Energy", brand: "Predator", image: "https://brand.monsterenergy.com/media/products/packshot/za_predator_gold.png", cpp: 80, cpl: 10 },
+
+            // Water - CPP: 84, CPL: 12
+            { id: 35, name: "VALPRE STILL 500 PET", code: "7950", category: "Water", brand: "Valpre", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/valpre/valpre-still-500ml.png", cpp: 84, cpl: 12 },
+            { id: 36, name: "BONAQUA STILL 500 PET", code: "2800", category: "Water", brand: "Bonaqua", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/bonaqua/bonaqua-still-500ml.png", cpp: 84, cpl: 12 }
         ];
 
-        const CATEGORIES = ["All Products", "2.0L PET", "2.25L PET", "1.0L PET", "440ml PET", "Cans"];
+        const CATEGORIES = ["All Products", "2.0L PET", "2.25L PET", "1.5L PET", "1.0L PET", "440ml PET", "Cans", "Energy", "Water"];
+
+        const DIFFICULTIES = [
+            { id: 'easy', name: 'Easy', decay: 1.2, multiplier: 1 },
+            { id: 'medium', name: 'Medium', decay: 2.2, multiplier: 1.5 },
+            { id: 'hard', name: 'Hard', decay: 3.8, multiplier: 2.5 }
+        ];
 
         const App = () => {
-            const [view, setView] = useState('menu');
+            const [view, setView] = useState('landing');
             const [gameMode, setGameMode] = useState(null);
             const [selectedCategory, setSelectedCategory] = useState(null);
+            const [difficulty, setDifficulty] = useState(DIFFICULTIES[1]); // Default Medium
             const [score, setScore] = useState(0);
             const [totalAttempted, setTotalAttempted] = useState(0);
+            const [highScore, setHighScore] = useState(localStorage.getItem('ccbsa_highscore') || 0);
+
+            const updateHighScore = (finalScore) => {
+                if (finalScore > highScore) {
+                    setHighScore(finalScore);
+                    localStorage.setItem('ccbsa_highscore', finalScore);
+                }
+            };
+
+            const enterApp = () => setView('menu');
 
             const selectMode = (mode) => {
                 setGameMode(mode);
+                setView('selectDifficulty');
+            };
+
+            const selectDifficulty = (diff) => {
+                setDifficulty(diff);
                 setView('selectCategory');
             };
 
@@ -77,32 +149,39 @@
                 setView(gameMode);
             };
 
-            const finishGame = () => setView('results');
+            const finishGame = () => {
+                updateHighScore(score);
+                setView('results');
+            };
+
             const goMenu = () => setView('menu');
             const showAbout = () => setView('about');
 
             return (
                 <div className="min-h-screen flex flex-col items-center p-4">
-                    <header className="w-full max-w-md p-6 flex justify-between items-center z-10">
-                        <div className="font-extrabold text-2xl tracking-tighter flex items-center gap-2">
-                            <div className="w-8 h-8 coke-red rounded flex items-center justify-center text-xs">CC</div>
-                            <span>ACCELERATOR</span>
-                        </div>
-                        {view !== 'menu' && (
-                            <button onClick={goMenu} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                    {view !== 'landing' && (
+                        <header className="w-full max-w-md p-6 flex justify-between items-center z-10">
+                            <div className="font-extrabold text-2xl tracking-tighter flex items-center gap-2">
+                                <div className="w-8 h-8 coke-red rounded flex items-center justify-center text-xs">CC</div>
+                                <span>ULTRA ACCELERATOR</span>
+                            </div>
+                            <button onClick={goMenu} className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700 hover:bg-slate-700">
                                 <i className="fas fa-home"></i>
                             </button>
-                        )}
-                    </header>
+                        </header>
+                    )}
 
                     <main className="w-full max-w-md mt-4 flex-1">
-                        {view === 'menu' && <Menu onSelectMode={selectMode} onShowAbout={showAbout} />}
+                        {view === 'landing' && <Landing onEnter={enterApp} />}
+                        {view === 'menu' && <Menu onSelectMode={selectMode} onShowAbout={showAbout} highScore={highScore} />}
+                        {view === 'selectDifficulty' && <DifficultySelect onSelectDifficulty={selectDifficulty} />}
                         {view === 'about' && <About onBack={goMenu} />}
                         {view === 'selectCategory' && <CategorySelect onSelectCategory={startGame} />}
                         {(view === 'recognition' || view === 'mastery' || view === 'pallet') && (
                             <Game
-                                type={view}
+                                type={gameMode}
                                 category={selectedCategory}
+                                difficulty={difficulty}
                                 onFinish={finishGame}
                                 setScore={setScore}
                                 score={score}
@@ -114,6 +193,7 @@
                             <Results
                                 score={score}
                                 total={totalAttempted}
+                                highScore={highScore}
                                 onRestart={() => startGame(selectedCategory)}
                                 onMenu={goMenu}
                             />
@@ -123,34 +203,293 @@
             );
         };
 
-        const Menu = ({ onSelectMode, onShowAbout }) => (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-10">
-                <div className="text-center mb-10">
-                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">Picking HQ</h1>
-                    <p className="text-slate-400 font-medium">Efficiency & Accuracy Modules</p>
+        const Landing = ({ onEnter }) => (
+            <div className="min-h-screen flex flex-col items-center justify-center text-center landing-gradient -m-4 p-8">
+                <div className="animate-in fade-in zoom-in duration-1000">
+                    <div className="w-24 h-24 coke-red rounded-3xl mx-auto flex items-center justify-center text-4xl font-black mb-8 shadow-[0_0_50px_rgba(244,0,9,0.3)]">
+                        CC
+                    </div>
+                    <h1 className="text-5xl font-black tracking-tighter mb-4 leading-none">
+                        PICKING<br/><span className="coke-red-text">ACCELERATOR</span>
+                    </h1>
+                    <div className="h-1 w-20 coke-red mx-auto rounded-full mb-8"></div>
+
+                    <p className="text-slate-400 font-medium mb-12 max-w-xs mx-auto leading-relaxed">
+                        Precision engineering for the human nodes of the supply chain.
+                    </p>
+
+                    <div className="glass-morphism p-6 rounded-[2rem] border-slate-700/50 mb-12">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Developed By</p>
+                        <h2 className="text-xl font-black text-white">Asemahle Nkwali</h2>
+                        <p className="text-[10px] text-slate-400 mt-2 italic">Empowering the right and more...</p>
+                    </div>
+
+                    <button
+                        onClick={onEnter}
+                        className="w-full coke-red text-white p-6 rounded-[2.5rem] font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl"
+                    >
+                        START TRAINING
+                    </button>
+
+                    <p className="mt-8 text-slate-500 font-bold uppercase tracking-widest animate-pulse">Enjoy the experience</p>
+                </div>
+            </div>
+        );
+
+        const Menu = ({ onSelectMode, onShowAbout, highScore }) => (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-6">
+                <div className="text-center mb-6">
+                    <h1 className="text-4xl font-black mb-2 tracking-tighter uppercase">Operations HQ</h1>
+                    <div className="inline-block px-4 py-1 rounded-full bg-slate-800 border border-slate-700">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Personal Best: {highScore} pts</span>
+                    </div>
                 </div>
 
                 <div className="grid gap-4">
-                    <button onClick={() => onSelectMode('recognition')} className="glass-morphism p-5 rounded-3xl text-left hover:border-red-500/50 transition-all flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-500 flex items-center justify-center text-xl"><i className="fas fa-eye"></i></div>
-                        <div><h3 className="font-bold">Visual Recognition</h3><p className="text-xs text-slate-400">Identify SKU by brand & size</p></div>
-                    </button>
-
-                    <button onClick={() => onSelectMode('mastery')} className="glass-morphism p-5 rounded-3xl text-left hover:border-blue-500/50 transition-all flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center text-xl"><i className="fas fa-brain"></i></div>
-                        <div><h3 className="font-bold">Material Mastery</h3><p className="text-xs text-slate-400">Match names to 4-digit codes</p></div>
-                    </button>
-
-                    <button onClick={() => onSelectMode('pallet')} className="glass-morphism p-5 rounded-3xl text-left hover:border-green-500/50 transition-all flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-green-500/20 text-green-500 flex items-center justify-center text-xl"><i className="fas fa-calculator"></i></div>
-                        <div><h3 className="font-bold">Pallet Logic</h3><p className="text-xs text-slate-400">Calculate case/pallet counts</p></div>
-                    </button>
+                    <ModeCard
+                        title="Visual Recognition"
+                        desc="SKU identification speed drill"
+                        icon="fa-eye"
+                        color="red"
+                        onClick={() => onSelectMode('recognition')}
+                    />
+                    <ModeCard
+                        title="Material Mastery"
+                        desc="4-digit code memorization"
+                        icon="fa-barcode"
+                        color="blue"
+                        onClick={() => onSelectMode('mastery')}
+                    />
+                    <ModeCard
+                        title="Pallet Intelligence"
+                        desc="CPP & Layer quantity logic"
+                        icon="fa-layer-group"
+                        color="green"
+                        onClick={() => onSelectMode('pallet')}
+                    />
                 </div>
 
                 <button onClick={onShowAbout} className="w-full mt-8 flex items-center justify-center gap-2 text-slate-500 hover:text-white transition-colors">
                     <i className="fas fa-info-circle"></i>
                     <span className="text-sm font-bold uppercase tracking-widest">Project Intel</span>
                 </button>
+            </div>
+        );
+
+        const ModeCard = ({ title, desc, icon, color, onClick }) => (
+            <button onClick={onClick} className="glass-morphism p-5 rounded-3xl text-left hover:border-slate-500 transition-all flex items-center gap-5 group">
+                <div className={`w-14 h-14 rounded-2xl bg-${color}-500/10 text-${color}-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform`}>
+                    <i className={`fas ${icon}`}></i>
+                </div>
+                <div>
+                    <h3 className="font-bold text-lg leading-tight">{title}</h3>
+                    <p className="text-xs text-slate-500">{desc}</p>
+                </div>
+                <div className="ml-auto text-slate-700 group-hover:text-slate-400">
+                    <i className="fas fa-chevron-right"></i>
+                </div>
+            </button>
+        );
+
+        const DifficultySelect = ({ onSelectDifficulty }) => (
+            <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-6">
+                <h2 className="text-2xl font-black mb-6 flex items-center gap-3">
+                    <i className="fas fa-tachometer-alt text-red-500"></i>
+                    SELECT INTENSITY
+                </h2>
+                <div className="grid gap-4">
+                    {DIFFICULTIES.map((diff) => (
+                        <button
+                            key={diff.id}
+                            onClick={() => onSelectDifficulty(diff)}
+                            className="glass-morphism p-6 rounded-[2rem] text-left hover:bg-slate-800 transition-all border-l-8 border-slate-800 hover:border-red-500 flex justify-between items-center"
+                        >
+                            <div>
+                                <span className="font-black text-xl block">{diff.name}</span>
+                                <span className="text-xs text-slate-500 uppercase font-bold tracking-widest">
+                                    {diff.id === 'easy' ? 'Steady Pace' : diff.id === 'medium' ? 'Warehouse Speed' : 'Elite Reflexes'}
+                                </span>
+                            </div>
+                            <div className="text-slate-700">
+                                {diff.multiplier}x Pts
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const CategorySelect = ({ onSelectCategory }) => (
+            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <h2 className="text-2xl font-black mb-6 flex items-center gap-3">
+                    <i className="fas fa-map-marker-alt text-red-500"></i>
+                    CHOOSE ZONE
+                </h2>
+                <div className="grid grid-cols-2 gap-3 pb-8">
+                    {CATEGORIES.map((cat) => (
+                        <button
+                            key={cat}
+                            onClick={() => onSelectCategory(cat)}
+                            className="glass-morphism p-5 rounded-2xl text-left hover:bg-slate-800 transition-all border-b-4 border-slate-800 active:border-b-0 active:translate-y-1"
+                        >
+                            <span className="font-bold text-sm leading-tight block">{cat}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const Game = ({ type, category, difficulty, onFinish, setScore, score, setTotal, total }) => {
+            const filteredData = useMemo(() => {
+                if (category === "All Products") return PRODUCT_DATA;
+                return PRODUCT_DATA.filter(p => p.category === category);
+            }, [category]);
+
+            const [currentQ, setCurrentQ] = useState(null);
+            const [options, setOptions] = useState([]);
+            const [timeLeft, setTimeLeft] = useState(100);
+            const [isAnswering, setIsAnswering] = useState(false);
+            const [feedback, setFeedback] = useState(null);
+            const [streak, setStreak] = useState(0);
+
+            const generateQuestion = () => {
+                const correct = filteredData[Math.floor(Math.random() * filteredData.length)];
+                let choices = [];
+
+                if (type === 'pallet') {
+                    const isLayerQ = Math.random() > 0.5;
+                    const layers = Math.floor(Math.random() * 4) + 1;
+                    const correctVal = isLayerQ ? (correct.cpl * layers) : correct.cpp;
+
+                    choices = [
+                        { id: 1, val: correctVal, isCorrect: true },
+                        { id: 2, val: correctVal + (correct.cpl || 10), isCorrect: false },
+                        { id: 3, val: correctVal - 5, isCorrect: false },
+                        { id: 4, val: Math.round(correctVal * 0.5), isCorrect: false }
+                    ].sort(() => Math.random() - 0.5);
+
+                    setCurrentQ({ ...correct, qTitle: isLayerQ ? `${layers} Layers of ${correct.name}` : `Full Pallet: ${correct.name}` });
+                } else {
+                    choices = [correct];
+                    while (choices.length < 4) {
+                        const random = PRODUCT_DATA[Math.floor(Math.random() * PRODUCT_DATA.length)];
+                        if (!choices.find(c => c.id === random.id)) choices.push(random);
+                    }
+                    choices = choices.sort(() => Math.random() - 0.5);
+                    setCurrentQ(correct);
+                }
+
+                setOptions(choices);
+                setFeedback(null);
+                setIsAnswering(false);
+                setTimeLeft(100);
+            };
+
+            useEffect(() => { generateQuestion(); }, []);
+
+            useEffect(() => {
+                if (timeLeft > 0 && !isAnswering) {
+                    const timer = setTimeout(() => setTimeLeft(prev => prev - difficulty.decay), 100);
+                    return () => clearTimeout(timer);
+                } else if (timeLeft <= 0) {
+                    handleAnswer(null);
+                }
+            }, [timeLeft, isAnswering, difficulty]);
+
+            const handleAnswer = (choice) => {
+                if (isAnswering) return;
+                setIsAnswering(true);
+                setTotal(prev => prev + 1);
+
+                const isCorrect = type === 'pallet' ? (choice && choice.isCorrect) : (choice && choice.id === currentQ.id);
+
+                if (isCorrect) {
+                    const basePoints = 10 * difficulty.multiplier;
+                    const speedBonus = Math.round((timeLeft / 10) * difficulty.multiplier);
+                    const streakBonus = Math.floor(streak / 2) * difficulty.multiplier;
+                    setScore(prev => Math.round(prev + basePoints + speedBonus + streakBonus));
+                    setStreak(prev => prev + 1);
+                    setFeedback('correct');
+                } else {
+                    setStreak(0);
+                    setFeedback('wrong');
+                }
+
+                setTimeout(() => {
+                    if (total + 1 >= 10) onFinish();
+                    else generateQuestion();
+                }, 800);
+            };
+
+            if (!currentQ) return null;
+
+            return (
+                <div className={`space-y-6 ${feedback === 'wrong' ? 'animate-shake' : ''}`}>
+                    <div className="flex justify-between items-center px-2">
+                        <div className="flex flex-col text-slate-500 uppercase font-black text-[10px] tracking-widest">
+                            <span className="text-red-500 font-black">{difficulty.name} MODE</span>
+                            <span className="text-white text-lg">{total + 1} / 10</span>
+                        </div>
+                        <div className="text-right flex flex-col font-black">
+                            <span className="text-slate-500 text-[10px] tracking-widest uppercase">Score</span>
+                            <span className="text-2xl">{score}</span>
+                        </div>
+                    </div>
+
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700 shadow-inner">
+                        <div
+                            className={`timer-bar h-full ${timeLeft < 30 ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-green-500'}`}
+                            style={{ width: `${timeLeft}%` }}
+                        ></div>
+                    </div>
+
+                    <div className={`glass-morphism p-8 rounded-[2.5rem] text-center border-2 flex flex-col items-center justify-center min-h-[320px] transition-all duration-300 ${
+                        feedback === 'correct' ? 'border-green-500 bg-green-500/10 animate-pulse-green' :
+                        feedback === 'wrong' ? 'border-red-500 bg-red-500/10' : 'border-slate-700 shadow-2xl'
+                    }`}>
+                        {type === 'recognition' && <img src={currentQ.image} className="product-image mb-4" />}
+                        {type === 'mastery' && <h2 className="text-3xl font-black uppercase tracking-tighter italic">{currentQ.name}</h2>}
+                        {type === 'pallet' && (
+                            <div className="p-3 bg-slate-800 rounded-2xl border border-slate-700 w-full">
+                                <h2 className="text-xl font-black uppercase tracking-tight leading-tight">{currentQ.qTitle}</h2>
+                            </div>
+                        )}
+                        {streak > 2 && <div className="mt-4 bg-orange-500 text-white px-3 py-1 rounded-full text-[10px] font-black animate-bounce shadow-lg shadow-orange-500/30">🔥 {streak} STREAK</div>}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {options.map((opt, i) => (
+                            <button
+                                key={i}
+                                onClick={() => handleAnswer(opt)}
+                                disabled={isAnswering}
+                                className={`p-4 rounded-3xl font-black text-[10px] leading-tight border-2 transition-all min-h-[80px] shadow-lg active:translate-y-1 ${
+                                    isAnswering && (type === 'pallet' ? opt.isCorrect : opt.id === currentQ.id)
+                                        ? 'bg-green-500 border-green-400 text-white scale-105 z-10' :
+                                    isAnswering && feedback === 'wrong' ? 'bg-slate-900 border-slate-800 text-slate-700' :
+                                    'bg-slate-800 border-slate-700 text-slate-200 hover:border-slate-500'
+                                }`}
+                            >
+                                {type === 'pallet' ? opt.val : (type === 'recognition' ? opt.name : opt.code)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const Results = ({ score, total, highScore, onRestart, onMenu }) => (
+            <div className="text-center space-y-6 animate-in zoom-in duration-300">
+                <div className="p-10 glass-morphism rounded-[3.5rem] border-slate-700">
+                    <div className="text-7xl font-black mb-2 text-red-500 tracking-tighter">{score}</div>
+                    <h2 className="text-xl font-black mb-6 uppercase tracking-widest">Final Score</h2>
+                    <div className="grid grid-cols-2 gap-4 border-t border-slate-700/50 pt-6">
+                        <div><p className="text-[10px] font-bold text-slate-500 uppercase">Personal Best</p><p className="text-xl font-bold">{highScore}</p></div>
+                        <div><p className="text-[10px] font-bold text-slate-500 uppercase">Status</p><p className="text-xl font-bold italic">ELITE</p></div>
+                    </div>
+                </div>
+                <button onClick={onRestart} className="w-full coke-red text-white p-5 rounded-[2rem] font-black text-xl shadow-xl shadow-red-500/20">NEW SHIFT</button>
+                <button onClick={onMenu} className="w-full bg-slate-800 p-5 rounded-[2rem] font-bold text-lg border border-slate-700">EXIT</button>
             </div>
         );
 
@@ -165,167 +504,11 @@
                         The **CCBSA Picking Accelerator** is a high-velocity training engine engineered to optimize the human nodes in our supply chain.
                         By eliminating SKU substitution errors at the source and slashing onboarding time, we turn every picker into a high-precision efficiency asset.
                     </p>
-
-                    <div className="space-y-4">
-                        <div className="flex gap-4">
-                            <div className="text-red-500 mt-1"><i className="fas fa-check-circle"></i></div>
-                            <div>
-                                <h4 className="font-bold text-sm">Visual Muscle Memory</h4>
-                                <p className="text-xs text-slate-500">Train the eye to instantly distinguish between 2L and 2.25L variants.</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="text-blue-500 mt-1"><i className="fas fa-check-circle"></i></div>
-                            <div>
-                                <h4 className="font-bold text-sm">Code Internalization</h4>
-                                <p className="text-xs text-slate-500">Eliminate the need for cheat sheets by memorizing material codes (e.g. 1040, 1091).</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="text-green-500 mt-1"><i className="fas fa-check-circle"></i></div>
-                            <div>
-                                <h4 className="font-bold text-sm">Pallet Intelligence</h4>
-                                <p className="text-xs text-slate-500">Master full pallet quantities to accelerate loading and inventory verification.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Architected by Asemahle Nkwali</p>
                 </div>
-
-                <button onClick={onBack} className="w-full bg-slate-800 p-5 rounded-3xl font-bold text-lg border border-slate-700 hover:bg-slate-700 transition-all">
-                    RETURN TO HQ
-                </button>
+                <button onClick={onBack} className="w-full bg-slate-800 p-5 rounded-3xl font-bold text-lg border border-slate-700">RETURN</button>
             </div>
         );
-
-        const CategorySelect = ({ onSelectCategory }) => (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                <h2 className="text-2xl font-black mb-6">Select Zone</h2>
-                <div className="grid grid-cols-2 gap-3">
-                    {CATEGORIES.map((cat) => (
-                        <button key={cat} onClick={() => onSelectCategory(cat)} className="glass-morphism p-4 rounded-2xl text-left hover:bg-slate-700/50 transition-colors">
-                            <span className="font-bold text-sm leading-tight">{cat}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        );
-
-        const Game = ({ type, category, onFinish, setScore, score, setTotal, total }) => {
-            const filteredData = useMemo(() => {
-                if (category === "All Products") return PRODUCT_DATA;
-                return PRODUCT_DATA.filter(p => p.category === category);
-            }, [category]);
-
-            const [currentQ, setCurrentQ] = useState(null);
-            const [options, setOptions] = useState([]);
-            const [timeLeft, setTimeLeft] = useState(100);
-            const [isAnswering, setIsAnswering] = useState(false);
-            const [feedback, setFeedback] = useState(null);
-
-            const generateQuestion = () => {
-                const correct = filteredData[Math.floor(Math.random() * filteredData.length)];
-                let choices = [];
-
-                if (type === 'pallet') {
-                    const cases = [correct.casesPerPallet, correct.casesPerPallet / 2, correct.casesPerPallet + 20, correct.casesPerPallet - 15].sort(() => Math.random() - 0.5);
-                    choices = cases.map(c => ({ id: Math.random(), val: Math.round(c), isCorrect: Math.round(c) === correct.casesPerPallet }));
-                } else {
-                    choices = [correct];
-                    while (choices.length < 4) {
-                        const random = PRODUCT_DATA[Math.floor(Math.random() * PRODUCT_DATA.length)];
-                        if (!choices.find(c => c.id === random.id)) choices.push(random);
-                    }
-                    choices = choices.sort(() => Math.random() - 0.5);
-                }
-
-                setCurrentQ(correct);
-                setOptions(choices);
-                setFeedback(null);
-                setIsAnswering(false);
-                setTimeLeft(100);
-            };
-
-            useEffect(() => { generateQuestion(); }, []);
-
-            useEffect(() => {
-                if (timeLeft > 0 && !isAnswering) {
-                    const timer = setTimeout(() => setTimeLeft(prev => prev - (type === 'pallet' ? 1.5 : 2.5)), 100);
-                    return () => clearTimeout(timer);
-                } else if (timeLeft <= 0) { handleAnswer(null); }
-            }, [timeLeft, isAnswering]);
-
-            const handleAnswer = (choice) => {
-                if (isAnswering) return;
-                setIsAnswering(true);
-                setTotal(prev => prev + 1);
-
-                const isCorrect = type === 'pallet' ? (choice && choice.isCorrect) : (choice && choice.id === currentQ.id);
-                if (isCorrect) { setScore(prev => prev + 1); setFeedback('correct'); }
-                else { setFeedback('wrong'); }
-
-                setTimeout(() => { if (total + 1 >= 10) onFinish(); else generateQuestion(); }, 800);
-            };
-
-            if (!currentQ) return null;
-
-            return (
-                <div className="space-y-6">
-                    <div className="flex justify-between items-center px-2">
-                        <span className="text-xs font-bold text-slate-500 tracking-widest">{total + 1} / 10</span>
-                        <span className="text-xl font-black text-red-500">{score}</span>
-                    </div>
-
-                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                        <div className={`h-full timer-bar ${timeLeft < 30 ? 'bg-red-500' : 'bg-green-500'}`} style={{ width: `${timeLeft}%` }}></div>
-                    </div>
-
-                    <div className={`glass-morphism p-8 rounded-[2.5rem] text-center border-2 flex flex-col items-center justify-center min-h-[300px] ${
-                        feedback === 'correct' ? 'border-green-500/50 bg-green-500/5' : feedback === 'wrong' ? 'border-red-500/50 bg-red-500/5' : 'border-slate-700'
-                    }`}>
-                        {type === 'recognition' && <img src={currentQ.image} className="product-image mb-4" />}
-                        {type === 'mastery' && <h2 className="text-3xl font-black">{currentQ.name}</h2>}
-                        {type === 'pallet' && (
-                            <div className="space-y-2">
-                                <h2 className="text-2xl font-black text-slate-400 uppercase tracking-tighter">Full Pallet Qty:</h2>
-                                <h2 className="text-4xl font-black text-white">{currentQ.name}</h2>
-                            </div>
-                        )}
-                        <p className="mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                            {type === 'pallet' ? "Select Cases Per Pallet" : `Match the ${type === 'recognition' ? 'Product' : 'Code'}`}
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        {options.map((opt, i) => (
-                            <button key={i} onClick={() => handleAnswer(opt)} className={`p-4 rounded-2xl font-black text-sm border transition-all min-h-[70px] ${
-                                isAnswering && (type === 'pallet' ? opt.isCorrect : opt.id === currentQ.id) ? 'bg-green-500 border-green-400' :
-                                isAnswering && feedback === 'wrong' ? 'bg-slate-800 opacity-50 border-slate-700' : 'bg-slate-800 border-slate-700 active:bg-slate-700'
-                            }`}>
-                                {type === 'pallet' ? opt.val : (type === 'recognition' ? opt.name : opt.code)}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        const Results = ({ score, total, onRestart, onMenu }) => {
-            const percentage = Math.round((score / total) * 100);
-            return (
-                <div className="text-center space-y-6 animate-in zoom-in duration-300">
-                    <div className="p-10 glass-morphism rounded-[3rem] border-slate-700">
-                        <div className="text-6xl font-black mb-2 text-red-500">{percentage}%</div>
-                        <h2 className="text-xl font-black mb-6 uppercase tracking-tight">{percentage === 100 ? "Master" : "Trainee"}</h2>
-                        <div className="grid grid-cols-2 gap-4 border-t border-slate-700 pt-6">
-                            <div><p className="text-[10px] font-bold text-slate-500 uppercase">Picked</p><p className="text-xl font-bold">{score}</p></div>
-                            <div><p className="text-[10px] font-bold text-slate-500 uppercase">Target</p><p className="text-xl font-bold">{total}</p></div>
-                        </div>
-                    </div>
-                    <button onClick={onRestart} className="w-full coke-red p-5 rounded-3xl font-black text-lg">RESTART DRILL</button>
-                    <button onClick={onMenu} className="w-full bg-slate-800 p-5 rounded-3xl font-bold text-lg">DASHBOARD</button>
-                </div>
-            );
-        };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
