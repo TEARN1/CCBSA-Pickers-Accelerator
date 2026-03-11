@@ -123,60 +123,145 @@
         const { useState, useEffect, useMemo, useRef } = React;
 
         const PRODUCT_DATA = [
-            // 2000 ML (2L) - CPP: 80, CPL: 20
-            { id: 1, name: "COKE 2000 SHR", code: "1040", category: "2.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2l.png", cpp: 80, cpl: 20 },
-            { id: 2, name: "FANTA ORANGE 2000 SHR", code: "3040", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-2l.png", cpp: 80, cpl: 20 },
-            { id: 3, name: "FANTA GRAPE 2000 SHR", code: "3240", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-grape-2l.png", cpp: 80, cpl: 20 },
-            { id: 4, name: "FANTA PINE 2000 SHR", code: "4755", category: "2.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-pineapple-2l.png", cpp: 80, cpl: 20 },
-            { id: 5, name: "SPRITE 2000 SHR", code: "5177", category: "2.0L PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-2l.png", cpp: 80, cpl: 20 },
-            { id: 6, name: "TWIST LEMON 2000 SHR", code: "5740", category: "2.0L PET", brand: "Twist", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/lemon-twist/lemon-twist-2l.png", cpp: 80, cpl: 20 },
-            { id: 7, name: "SPARL CREM SODA 2000 SHR", code: "6040", category: "2.0L PET", brand: "Sparletta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sparletta/sparletta-cream-soda-2l.png", cpp: 80, cpl: 20 },
-            { id: 8, name: "STONEY 2000 SHR", code: "6540", category: "2.0L PET", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-2l.png", cpp: 80, cpl: 20 },
-
-            // 2250 ML (2.25L) - CPP: 64, CPL: 16
-            { id: 10, name: "COKE 2250 SHR", code: "1263", category: "2.25L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2.25l.png", cpp: 64, cpl: 16 },
-            { id: 11, name: "COKE NO SUGAR 2250 SHR", code: "5954", category: "2.25L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-2.25l.png", cpp: 64, cpl: 16 },
-            { id: 12, name: "SPRITE NO SUGAR 2250 SHR", code: "2263", category: "2.25L PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-no-sugar-2.25l.png", cpp: 64, cpl: 16 },
-            { id: 13, name: "FANTA NO SUGAR 2250 SHR", code: "2754", category: "2.25L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-no-sugar-2.25l.png", cpp: 64, cpl: 16 },
-            { id: 14, name: "SPARL CREM SODA 2250 PET", code: "11414", category: "2.25L PET", brand: "Sparletta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sparletta/sparletta-cream-soda-2l.png", cpp: 64, cpl: 16 },
-
-            // 1000 ML (1L) - CPP: 75, CPL: 15
-            { id: 15, name: "1000ml Coke", code: "1091", category: "1.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1l.png", cpp: 75, cpl: 15 },
-            { id: 16, name: "1000ml Coke Zero", code: "1574", category: "1.0L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-1l.png", cpp: 75, cpl: 15 },
-            { id: 17, name: "1000ml Fanta Orange", code: "3091", category: "1.0L PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-1l.png", cpp: 75, cpl: 15 },
-            { id: 18, name: "1000ml Stoney", code: "6591", category: "1.0L PET", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-1l.png", cpp: 75, cpl: 15 },
-
-            // 1.5L - CPP: 55, CPL: 11
-            { id: 19, name: "COKE 1500 SHR", code: "1759", category: "1.5L PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1.5l.png", cpp: 55, cpl: 11 },
-            { id: 20, name: "SPRITE LS 1.5L SHR", code: "6121", category: "1.5L PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-1.5l.png", cpp: 55, cpl: 11 },
-
-            // 440ML PET - CPP: 84, CPL: 12
-            { id: 21, name: "COKE 440 PET", code: "7579", category: "440ml PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-440ml.png", cpp: 84, cpl: 12 },
-            { id: 22, name: "FANTA ORANGE 440 PET", code: "6207", category: "440ml PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-440ml.png", cpp: 84, cpl: 12 },
-            { id: 23, name: "SPRITE 440 PET", code: "7947", category: "440ml PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-440ml.png", cpp: 84, cpl: 12 },
-
-            // Cans 300ml - CPP: 143, CPL: 13
-            { id: 24, name: "COKE 300 CAN", code: "7638", category: "Cans", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-300ml.png", cpp: 143, cpl: 13 },
-            { id: 25, name: "FANTA ORANGE 300 CAN", code: "7713", category: "Cans", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-300ml.png", cpp: 143, cpl: 13 },
-
-            // Energy - CPP: 80, CPL: 10
-            { id: 26, name: "MONSTER ORIGINAL 500 CAN", code: "6863", category: "Energy", brand: "Monster", image: "https://brand.monsterenergy.com/media/products/packshot/za_monster_original.png", cpp: 80, cpl: 10 },
-            { id: 27, name: "PLAY ORIGINAL LS 440 CAN", code: "6644", category: "Energy", brand: "Powerplay", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/powerplay/powerplay-original-440ml.png", cpp: 90, cpl: 10 },
-
-            // BIBs - CPP: 40, CPL: 10
-            { id: 28, name: "10L COKE ZERO BIB", code: "1529", category: "BIB", brand: "Coke", image: "https://via.placeholder.com/150?text=BIB+10L", cpp: 40, cpl: 10 },
-            { id: 29, name: "20L SPRITE LS BIB", code: "6202", category: "BIB", brand: "Sprite", image: "https://via.placeholder.com/150?text=BIB+20L", cpp: 40, cpl: 10 },
-
-            // Returnables - CPP: 60, CPL: 10
-            { id: 30, name: "COKE 300ML RGBPL", code: "10193", category: "Returnables", brand: "Coke", image: "https://via.placeholder.com/150?text=RGB+300ml", cpp: 60, cpl: 10 },
-            { id: 31, name: "STONEY 300ML RGBPL", code: "10189", category: "Returnables", brand: "Stoney", image: "https://via.placeholder.com/150?text=RGB+300ml", cpp: 60, cpl: 10 },
-
-            // Water - CPP: 84, CPL: 12
-            { id: 32, name: "VALPRE STILL 500 PET", code: "7950", category: "Water", brand: "Valpre", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/valpre/valpre-still-500ml.png", cpp: 84, cpl: 12 },
-            { id: 33, name: "BONAQUA STILL 500 PET", code: "2800", category: "Water", brand: "Bonaqua", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/bonaqua/bonaqua-still-500ml.png", cpp: 84, cpl: 12 }
+            { id: 1, name: "COKE 01X06 2000 SHR", code: "1040", category: "2000 ML SHR", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2l.png", cpl: 20, cpp: 80 },
+            { id: 2, name: "FANTA ORANGE 01X06 2000 SHR", code: "3040", category: "2000 ML SHR", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-2l.png", cpl: 20, cpp: 80 },
+            { id: 3, name: "FANTA GRAPE 01X06 2000 SHR", code: "3240", category: "2000 ML SHR", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-grape-2l.png", cpl: 20, cpp: 80 },
+            { id: 4, name: "FANTA PINE 01X06 2000 SHR", code: "4755", category: "2000 ML SHR", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-pineapple-2l.png", cpl: 20, cpp: 80 },
+            { id: 5, name: "SPRITE 01X06 2000 SHR", code: "5177", category: "2000 ML SHR", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-2l.png", cpl: 20, cpp: 80 },
+            { id: 6, name: "TWIST GRANDILLA 01X06 2000 SHR", code: "5240", category: "2000 ML SHR", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Granadilla", cpl: 20, cpp: 80 },
+            { id: 7, name: "SCHW SODA WATER 01X06 2000 SHR", code: "5340", category: "2000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Soda", cpl: 20, cpp: 80 },
+            { id: 8, name: "TWIST LEMON 01X06 2000 SHR", code: "5740", category: "2000 ML SHR", brand: "Twist", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/lemon-twist/lemon-twist-2l.png", cpl: 20, cpp: 80 },
+            { id: 9, name: "SPARL CREM SODA 01X06 2000 SHR", code: "6040", category: "2000 ML SHR", brand: "Sparletta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sparletta/sparletta-cream-soda-2l.png", cpl: 20, cpp: 80 },
+            { id: 10, name: "SPARL SPARBERRY 01X06 2000 SHR", code: "6141", category: "2000 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Sparberry", cpl: 20, cpp: 80 },
+            { id: 11, name: "SPARL PINE NUT 01X06 2000 SHR", code: "6240", category: "2000 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Pinenut", cpl: 20, cpp: 80 },
+            { id: 12, name: "SPARL APPLE 01X06 2000 SHR", code: "6281", category: "2000 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Apple", cpl: 20, cpp: 80 },
+            { id: 13, name: "SPARL IRON BREW 01X06 2000 SHR", code: "6440", category: "2000 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Iron+Brew", cpl: 20, cpp: 80 },
+            { id: 14, name: "STONEY 01X06 2000 SHR", code: "6540", category: "2000 ML SHR", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-2l.png", cpl: 20, cpp: 80 },
+            { id: 15, name: "STONEY X GINGER 01X06 2000 SHR", code: "7879", category: "2000 ML SHR", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney+Extra+Ginger", cpl: 20, cpp: 80 },
+            { id: 16, name: "SPRITE NO SUGAR 01X06 2250 SHR", code: "2263", category: "2250 ML SHR", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-no-sugar-2.25l.png", cpl: 16, cpp: 64 },
+            { id: 17, name: "COKE LIGHT NS 01X06 2250 SHR", code: "2518", category: "2250 ML SHR", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+Light", cpl: 16, cpp: 64 },
+            { id: 18, name: "FANTA NO SUGAR 01X06 2250 SHR", code: "2754", category: "2250 ML SHR", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-no-sugar-2.25l.png", cpl: 16, cpp: 64 },
+            { id: 19, name: "COKE NSNC 01X06 2250 PET", code: "3924", category: "2250 ML SHR", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+NSNC", cpl: 16, cpp: 64 },
+            { id: 20, name: "COKE NO SUGAR 01X06 2250 SHR", code: "5954", category: "2250 ML SHR", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-2.25l.png", cpl: 16, cpp: 64 },
+            { id: 21, name: "COKE 1X6 2250 SHR", code: "1263", category: "2250 ML SHR", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-2.25l.png", cpl: 16, cpp: 64 },
+            { id: 22, name: "TWIST LEMON 01X06 2250ML PET SHR", code: "11412", category: "2250 ML SHR", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Lemon", cpl: 16, cpp: 64 },
+            { id: 23, name: "SPARLETTA CRÈME SODA 01X06 2250ML PET SHR", code: "11414", category: "2250 ML SHR", brand: "Sparletta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sparletta/sparletta-cream-soda-2l.png", cpl: 16, cpp: 64 },
+            { id: 24, name: "SPARLETTA APPLE 01X06 2250ML PET SHR", code: "11413", category: "2250 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Apple", cpl: 16, cpp: 64 },
+            { id: 25, name: "SPARLETTA IRON BREW 01X06 2250ML PET SHR", code: "11415", category: "2250 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Iron+Brew", cpl: 16, cpp: 64 },
+            { id: 26, name: "TWIST GRANADILLA 01X06 2250ML PET SHR", code: "11411", category: "2250 ML SHR", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Granadilla", cpl: 16, cpp: 64 },
+            { id: 27, name: "SPARLETTA PINE NUT 01X06 2250ML PET SHR", code: "11416", category: "2250 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Pinenut", cpl: 16, cpp: 64 },
+            { id: 28, name: "SPARLETTA SPARBERRY 01X06 2250ML PET SHR", code: "11417", category: "2250 ML SHR", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Sparberry", cpl: 16, cpp: 64 },
+            { id: 29, name: "STONEY NO SUGAR 01X06 2250 SHR", code: "6663", category: "2250 ML SHR", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney+No+Sugar", cpl: 16, cpp: 64 },
+            { id: 30, name: "1000ml Coke", code: "1091", category: "1000 ML SHR", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1l.png", cpl: 15, cpp: 75 },
+            { id: 31, name: "1000ml Coke Zero", code: "1574", category: "1000 ML SHR", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-1l.png", cpl: 15, cpp: 75 },
+            { id: 32, name: "1000ml Fanta Orange", code: "3091", category: "1000 ML SHR", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-1l.png", cpl: 15, cpp: 75 },
+            { id: 33, name: "1000ml Soda Water", code: "5391", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Soda", cpl: 15, cpp: 75 },
+            { id: 34, name: "1000ml Tonic Water", code: "5491", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Tonic", cpl: 15, cpp: 75 },
+            { id: 35, name: "1000ml Lemonade", code: "5889", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Lemonade", cpl: 15, cpp: 75 },
+            { id: 36, name: "1000ml Ginger Ale", code: "5991", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Ginger+Ale", cpl: 15, cpp: 75 },
+            { id: 37, name: "1000ml Stoney", code: "6591", category: "1000 ML SHR", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-1l.png", cpl: 15, cpp: 75 },
+            { id: 38, name: "1000ml Sprite LS", code: "6977", category: "1000 ML SHR", brand: "Sprite", image: "https://via.placeholder.com/150?text=Sprite", cpl: 15, cpp: 75 },
+            { id: 39, name: "SCHW TONIC ZERO 01X12 1000 SHR", code: "7889", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Tonic+Zero", cpl: 15, cpp: 75 },
+            { id: 40, name: "SCHW TANGERINE 01X12 1000ML PET SKITTLE", code: "11338", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Tangerine", cpl: 13, cpp: 65 },
+            { id: 41, name: "SCHW PINEAPPLE COCONUT 01X12 1000ML PET SKITTLE", code: "11339", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Pineapple", cpl: 13, cpp: 65 },
+            { id: 42, name: "SCHW POMEGRANATE 1X12 1000ML PET SKITTLE", code: "11337", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Pomegranate", cpl: 13, cpp: 65 },
+            { id: 43, name: "SCHW DRY LEMON LS 1X12 1000 PT", code: "10231", category: "1000 ML SHR", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Dry+Lemon", cpl: 13, cpp: 65 },
+            { id: 44, name: "COKE 01X12 1500 SHR", code: "1759", category: "1.5L 12PACK", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-1.5l.png", cpl: 11, cpp: 55 },
+            { id: 45, name: "COKE 1X4 1500 SHR 4PK", code: "1207", category: "1.5L 12PACK", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+1.5L", cpl: 30, cpp: 120 },
+            { id: 46, name: "COKE ZERO 01X12 1500 SHR", code: "1599", category: "1.5L 12PACK", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+Zero", cpl: 11, cpp: 55 },
+            { id: 47, name: "SPRITE LS 12X1500ML SHR", code: "6121", category: "1.5L 12PACK", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-1.5l.png", cpl: 11, cpp: 55 },
+            { id: 48, name: "FANTA ORANGE 01X12 1500 SHR", code: "3174", category: "1.5L 12PACK", brand: "Fanta", image: "https://via.placeholder.com/150?text=Fanta+Orange", cpl: 11, cpp: 55 },
+            { id: 49, name: "STONEY 01X12 1500 SHR", code: "6588", category: "1.5L 12PACK", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney", cpl: 11, cpp: 55 },
+            { id: 50, name: "STONEY ZERO 01X12 1500 SHR", code: "6122", category: "1.5L 12PACK", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney+Zero", cpl: 11, cpp: 55 },
+            { id: 51, name: "TWIST GRANDILLA 01X12 1500 SHR", code: "5269", category: "1.5L 12PACK", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Granadilla", cpl: 11, cpp: 55 },
+            { id: 52, name: "TWIST LEMON 01X12 1500 SHR", code: "5769", category: "1.5L 12PACK", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Lemon", cpl: 11, cpp: 55 },
+            { id: 53, name: "SPARL CREME SODA 01X12 1500 SHR", code: "5567", category: "1.5L 12PACK", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Creme+Soda", cpl: 11, cpp: 55 },
+            { id: 54, name: "SPARL IRON BREW 01X12 1500 SHR", code: "5557", category: "1.5L 12PACK", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Iron+Brew", cpl: 11, cpp: 55 },
+            { id: 55, name: "SPARL PINE NUT 01X12 1500 SHR", code: "5569", category: "1.5L 12PACK", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Pinenut", cpl: 11, cpp: 55 },
+            { id: 56, name: "SPARL SPARBERRY 01X12 1500 SHR", code: "5588", category: "1.5L 12PACK", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Sparberry", cpl: 11, cpp: 55 },
+            { id: 57, name: "COKE NO SUGAR NO CAFFEINE 01X12 1500ML P", code: "3915", category: "1.5L 12PACK", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+NSNC", cpl: 11, cpp: 55 },
+            { id: 58, name: "FANTA GRAPE 01X24 440 PET", code: "4729", category: "440ML PET", brand: "Fanta", image: "https://via.placeholder.com/150?text=Fanta+Grape", cpl: 12, cpp: 84 },
+            { id: 59, name: "FANTA ORANGE 01X24 440 PET", code: "6207", category: "440ML PET", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-440ml.png", cpl: 12, cpp: 84 },
+            { id: 60, name: "FANTA PINE 01X24 440 PET", code: "6208", category: "440ML PET", brand: "Fanta", image: "https://via.placeholder.com/150?text=Fanta+Pineapple", cpl: 12, cpp: 84 },
+            { id: 61, name: "SPARL IRON BREW 01X24 440 PET", code: "6486", category: "440ML PET", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Iron+Brew", cpl: 12, cpp: 84 },
+            { id: 62, name: "SPARL CREM SODA 01X24 440 PET", code: "6889", category: "440ML PET", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Creme+Soda", cpl: 12, cpp: 84 },
+            { id: 63, name: "SPARL SPARBERRY 01X24 440 PET", code: "6890", category: "440ML PET", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Sparberry", cpl: 12, cpp: 84 },
+            { id: 64, name: "STONEY 01X24 440 PET", code: "6891", category: "440ML PET", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney", cpl: 12, cpp: 84 },
+            { id: 65, name: "TWIST LEMON 01X24 440 PET", code: "6893", category: "440ML PET", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Lemon", cpl: 12, cpp: 84 },
+            { id: 66, name: "TWIST GRANADILLA 01X24 440 PET", code: "6894", category: "440ML PET", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Granadilla", cpl: 12, cpp: 84 },
+            { id: 67, name: "COKE 01X24 440 PET", code: "7579", category: "440ML PET", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-440ml.png", cpl: 12, cpp: 84 },
+            { id: 68, name: "STONEY X GINGER 01X24 440 PET", code: "7930", category: "440ML PET", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney+Extra+Ginger", cpl: 12, cpp: 84 },
+            { id: 69, name: "SPRITE 01X24 440 PET", code: "7947", category: "440ML PET", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-440ml.png", cpl: 12, cpp: 84 },
+            { id: 70, name: "COKE ZERO SUGAR ZERO CAFF 01X24 440ML PET", code: "11227", category: "440ML PET", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+Zero+Caffeine+Free", cpl: 12, cpp: 84 },
+            { id: 71, name: "COKE LIGHT 01X24 440ML PET", code: "5767", category: "440ML PET", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+Light", cpl: 12, cpp: 84 },
+            { id: 72, name: "COKE ZERO 01X24 440ML PET", code: "7583", category: "440ML PET", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+Zero", cpl: 12, cpp: 84 },
+            { id: 73, name: "STONEY ZERO 01X24 440ML PET", code: "6892", category: "440ML PET", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney+Zero", cpl: 12, cpp: 84 },
+            { id: 74, name: "FANTA ZERO 01X24 440ML PET", code: "6209", category: "440ML PET", brand: "Fanta", image: "https://via.placeholder.com/150?text=Fanta+Zero", cpl: 12, cpp: 84 },
+            { id: 75, name: "SPRITE ZERO 01X24 440ML PET", code: "2216", category: "440ML PET", brand: "Sprite", image: "https://via.placeholder.com/150?text=Sprite+Zero", cpl: 12, cpp: 84 },
+            { id: 76, name: "COKE PRE-PRICED 500ML 01X24 CAN", code: "11277", category: "500ML CAN", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+500ml", cpl: 10, cpp: 80 },
+            { id: 77, name: "FANTA ORANGE PRE-PRICED 500ML 01X24 CAN", code: "11278", category: "500ML CAN", brand: "Fanta", image: "https://via.placeholder.com/150?text=Fanta+500ml", cpl: 10, cpp: 80 },
+            { id: 78, name: "SPRITE LS PRE-PRICED 500ML 01X24 CAN", code: "11279", category: "500ML CAN", brand: "Sprite", image: "https://via.placeholder.com/150?text=Sprite+500ml", cpl: 10, cpp: 80 },
+            { id: 79, name: "COKE ZERO PRE-PRICED 500ML 01X24 CAN", code: "11329", category: "500ML CAN", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+Zero+500ml", cpl: 10, cpp: 80 },
+            { id: 80, name: "STONEY PRE-PRICED 500ML 01X24 CAN", code: "11280", category: "500ML CAN", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney+500ml", cpl: 10, cpp: 80 },
+            { id: 81, name: "TWIST LEMON 500ML 01X24 CAN", code: "11350", category: "500ML CAN", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Lemon+500ml", cpl: 10, cpp: 80 },
+            { id: 82, name: "SPARLETTA PINE NUT 500ML 01X24 CAN", code: "11348", category: "500ML CAN", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Pinenut+500ml", cpl: 10, cpp: 80 },
+            { id: 83, name: "SPARLETTA CREME SODA 500ML 01X24 CAN", code: "11347", category: "500ML CAN", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Creme+Soda+500ml", cpl: 10, cpp: 80 },
+            { id: 84, name: "TWIST GRANADILLA 500ML 01X24 CAN", code: "11349", category: "500ML CAN", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Granadilla+500ml", cpl: 10, cpp: 80 },
+            { id: 85, name: "COKE 01X12 750ML PET", code: "11367", category: "750ML PET", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+750ml", cpl: 17, cpp: 102 },
+            { id: 86, name: "FANTA ORANGE 01X12 750ML PET", code: "11368", category: "750ML PET", brand: "Fanta", image: "https://via.placeholder.com/150?text=Fanta+750ml", cpl: 17, cpp: 102 },
+            { id: 87, name: "STONEY GINGER BEER 01X12 750ML PET", code: "11370", category: "750ML PET", brand: "Stoney", image: "https://via.placeholder.com/150?text=Stoney+750ml", cpl: 17, cpp: 102 },
+            { id: 88, name: "SPRITE 01X12 750ML PET", code: "11369", category: "750ML PET", brand: "Sprite", image: "https://via.placeholder.com/150?text=Sprite+750ml", cpl: 17, cpp: 102 },
+            { id: 89, name: "10L Coke Zero BIB", code: "1529", category: "10L BIB", brand: "Coke", image: "https://via.placeholder.com/150?text=BIB+10L", cpl: 10, cpp: 40 },
+            { id: 90, name: "10L F/Orange BIB", code: "3000", category: "10L BIB", brand: "Fanta", image: "https://via.placeholder.com/150?text=BIB+10L", cpl: 10, cpp: 40 },
+            { id: 91, name: "10L Spar C/Soda BIB", code: "6000", category: "10L BIB", brand: "Sparletta", image: "https://via.placeholder.com/150?text=BIB+10L", cpl: 10, cpp: 40 },
+            { id: 92, name: "10L Sprite LS BIB", code: "6201", category: "10L BIB", brand: "Sprite", image: "https://via.placeholder.com/150?text=BIB+10L", cpl: 10, cpp: 40 },
+            { id: 93, name: "STONEY NO SUGAR 01X01 10LT BIB", code: "6222", category: "10L BIB", brand: "Stoney", image: "https://via.placeholder.com/150?text=BIB+10L", cpl: 10, cpp: 40 },
+            { id: 94, name: "STONEY NO SUGAR 01X01 20LT BIB", code: "6223", category: "20L BIB", brand: "Stoney", image: "https://via.placeholder.com/150?text=BIB+20L", cpl: 10, cpp: 40 },
+            { id: 95, name: "20L COKE ZERO", code: "1487", category: "20L BIB", brand: "Coke", image: "https://via.placeholder.com/150?text=BIB+20L", cpl: 10, cpp: 40 },
+            { id: 96, name: "COKE LESS SUGAR 01X01 20LT BIB", code: "10779", category: "20L BIB", brand: "Coke", image: "https://via.placeholder.com/150?text=BIB+20L", cpl: 10, cpp: 40 },
+            { id: 97, name: "SPRITE LS 01X01 20LT BIB", code: "6202", category: "20L BIB", brand: "Sprite", image: "https://via.placeholder.com/150?text=BIB+20L", cpl: 10, cpp: 40 },
+            { id: 98, name: "20L F/Orange BIB", code: "3067", category: "20L BIB", brand: "Fanta", image: "https://via.placeholder.com/150?text=BIB+20L", cpl: 10, cpp: 40 },
+            { id: 99, name: "20L Spar C/Soda BIB", code: "6067", category: "20L BIB", brand: "Sparletta", image: "https://via.placeholder.com/150?text=BIB+20L", cpl: 10, cpp: 40 },
+            { id: 100, name: "200ml COKE ZERO", code: "4932", category: "200ML CANS", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+200ml", cpl: 15, cpp: 180 },
+            { id: 101, name: "200ml COKE", code: "1021", category: "200ML CANS", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+200ml", cpl: 15, cpp: 180 },
+            { id: 102, name: "200ml COKE LIGHT", code: "1621", category: "200ML CANS", brand: "Coke", image: "https://via.placeholder.com/150?text=Coke+Light+200ml", cpl: 15, cpp: 180 },
+            { id: 103, name: "200ml SCHW SODA", code: "5321", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Soda+200ml", cpl: 15, cpp: 180 },
+            { id: 104, name: "200ml SCHW TONIC", code: "5421", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Tonic+200ml", cpl: 15, cpp: 180 },
+            { id: 105, name: "200ml SCHW LEMONADE", code: "5821", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Lemonade+200ml", cpl: 15, cpp: 180 },
+            { id: 106, name: "200ml SCHW GINGER ALE", code: "5921", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Ginger+Ale+200ml", cpl: 15, cpp: 180 },
+            { id: 107, name: "200ml SCHW TONIC ZERO", code: "7731", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Tonic+Zero+200ml", cpl: 15, cpp: 180 },
+            { id: 108, name: "SCHW DRY LEMON LS 04X06 200 CAN", code: "10232", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Dry+Lemon+200ml", cpl: 15, cpp: 180 },
+            { id: 109, name: "SCHW FLO PINK TON 4X6 200 CAN", code: "3999", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Pink+Tonic+200ml", cpl: 15, cpp: 180 },
+            { id: 110, name: "PLAY ORIGINAL LS 06X04 250 CAN", code: "6640", category: "200ML CANS", brand: "Powerplay", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/powerplay/powerplay-original-440ml.png", cpl: 15, cpp: 150 },
+            { id: 111, name: "SCHWEPPES GRAPEFRUIT 04X06 200 CAN", code: "11155", category: "200ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Grapefruit+200ml", cpl: 15, cpp: 180 },
+            { id: 112, name: "COKE LIGHT ZERO 04X06 300 CAN", code: "7649", category: "300ML CANS", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-light-300ml.png", cpl: 13, cpp: 143 },
+            { id: 113, name: "COKE KOSHER 04X06 300ML CAN", code: "7645", category: "300ML CANS", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-300ml.png", cpl: 13, cpp: 143 },
+            { id: 114, name: "SCHW DRY LEMON LS 04X06 300 CAN", code: "10234", category: "300ML CANS", brand: "Schweppes", image: "https://via.placeholder.com/150?text=Schweppes+Dry+Lemon+300ml", cpl: 13, cpp: 143 },
+            { id: 115, name: "FANTA NO SUGAR 04X06 300 CAN", code: "7548", category: "300ML CANS", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-no-sugar-300ml.png", cpl: 13, cpp: 143 },
+            { id: 116, name: "SPRITE NO SUGAR 04X06 300 CAN", code: "7590", category: "300ML CANS", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-no-sugar-300ml.png", cpl: 13, cpp: 143 },
+            { id: 117, name: "TWIST GRANDILLA 04X06 300 CAN", code: "7592", category: "300ML CANS", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Granadilla+300ml", cpl: 13, cpp: 143 },
+            { id: 118, name: "TWIST LEMON 04X06 300 CAN", code: "7593", category: "300ML CANS", brand: "Twist", image: "https://via.placeholder.com/150?text=Twist+Lemon+300ml", cpl: 13, cpp: 143 },
+            { id: 119, name: "COKE 04X06 300 CAN", code: "7638", category: "300ML CANS", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-300ml.png", cpl: 13, cpp: 143 },
+            { id: 120, name: "COKE NO SUGAR 04X06 300 CAN", code: "7673", category: "300ML CANS", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-300ml.png", cpl: 13, cpp: 143 },
+            { id: 121, name: "FANTA ORANGE 04X06 300 CAN", code: "7713", category: "300ML CANS", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-300ml.png", cpl: 13, cpp: 143 },
+            { id: 122, name: "SPARL CREM SODA 04X06 300 CAN", code: "7752", category: "300ML CANS", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Creme+Soda+300ml", cpl: 13, cpp: 143 },
+            { id: 123, name: "SPARL SPARBERRY 04X06 300 CAN", code: "7755", category: "300ML CANS", brand: "Sparletta", image: "https://via.placeholder.com/150?text=Sparletta+Sparberry+300ml", cpl: 13, cpp: 143 },
+            { id: 124, name: "SPRITE 04X06 300 CAN", code: "7757", category: "300ML CANS", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-300ml.png", cpl: 13, cpp: 143 },
+            { id: 125, name: "STONEY 04X06 300 CAN", code: "7797", category: "300ML CANS", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-300ml.png", cpl: 13, cpp: 143 },
+            { id: 126, name: "COKE 03X08 300C 8 PACK", code: "10622", category: "300ML CANS PROMO", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-original-300ml.png", cpl: 13, cpp: 143 },
+            { id: 127, name: "COKE NO SUGAR 03X08 300C 8 PACK", code: "10623", category: "300ML CANS PROMO", brand: "Coke", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/products/coca-cola-zero-sugar-300ml.png", cpl: 13, cpp: 143 },
+            { id: 128, name: "FANTA ORANGE 03X08 300C 8 PACK", code: "10625", category: "300ML CANS PROMO", brand: "Fanta", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/fanta/fanta-orange-300ml.png", cpl: 13, cpp: 143 },
+            { id: 129, name: "SPRITE LS 03X08 300C 8 PACK", code: "10628", category: "300ML CANS PROMO", brand: "Sprite", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/sprite/sprite-300ml.png", cpl: 13, cpp: 143 },
+            { id: 130, name: "STONEY 03X08 300C 8 PACK", code: "10630", category: "300ML CANS PROMO", brand: "Stoney", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/stoney/stoney-300ml.png", cpl: 13, cpp: 143 },
+            { id: 131, name: "PLAY ORIGINAL LS 06X04 440 CAN", code: "6644", category: "Powerplay 440ML", brand: "Powerplay", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/powerplay/powerplay-original-440ml.png", cpl: 10, cpp: 90 },
+            { id: 132, name: "MONSTER ORIGINAL 500 CAN", code: "6863", category: "500ml Monster", brand: "Monster", image: "https://brand.monsterenergy.com/media/products/packshot/za_monster_original.png", cpl: 10, cpp: 80 },
+            { id: 133, name: "VALPRE STILL 500 PET", code: "7950", category: "Valpre", brand: "Valpre", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/valpre/valpre-still-500ml.png", cpl: 12, cpp: 84 },
+            { id: 134, name: "BONAQUA STILL 500 PET", code: "2800", category: "500ml BONAQUA", brand: "Bonaqua", image: "https://www.coca-cola.com/content/dam/on-premise/za/en/brands/bonaqua/bonaqua-still-500ml.png", cpl: 12, cpp: 84 },
+            { id: 135, name: "COKE 300ML RGBPL", code: "10193", category: "300ml RET", brand: "Coke", image: "https://via.placeholder.com/150?text=RGB+300ml", cpl: 10, cpp: 60 },
+            { id: 136, name: "STONEY 300ML RGBPL", code: "10189", category: "300ml RET", brand: "Stoney", image: "https://via.placeholder.com/150?text=RGB+300ml", cpl: 10, cpp: 60 }
         ];
 
-        const CATEGORIES = ["All Products", "2.0L PET", "2.25L PET", "1.5L PET", "1.0L PET", "440ml PET", "Cans", "Energy", "Water", "BIB", "Returnables"];
+        const CATEGORIES = ["All Products", "2000 ML SHR", "2250 ML SHR", "1000 ML SHR", "1.5L 12PACK", "440ML PET", "500ML CAN", "750ML PET", "10L BIB", "20L BIB", "200ML CANS", "300ML CANS", "300ML CANS PROMO", "Powerplay 440ML", "500ml Monster", "Valpre", "500ml BONAQUA", "300ml RET"];
 
         const DIFFICULTIES = [
             { id: 'easy', name: 'Easy', decay: 1.2, multiplier: 1 },
@@ -394,6 +479,20 @@
                         color="green"
                         onClick={() => onSelectMode('pallet')}
                     />
+                    <ModeCard
+                        title="Advanced Drill"
+                        desc="A mix of all exercise types"
+                        icon="fa-brain"
+                        color="yellow"
+                        onClick={() => onSelectMode('advanced')}
+                    />
+                    <ModeCard
+                        title="Marathon"
+                        desc="Survive as long as you can"
+                        icon="fa-road"
+                        color="purple"
+                        onClick={() => onSelectMode('marathon')}
+                    />
                 </div>
 
                 <button onClick={onShowAbout} className="w-full mt-8 flex items-center justify-center gap-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -404,7 +503,7 @@
         );
 
         const ModeCard = ({ title, desc, icon, color, onClick }) => (
-            <button onClick={onClick} className="p-5 rounded-3xl text-left transition-all flex items-center gap-5 group bg-slate-100/70 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500">
+            <button onClick={onClick} className={`p-5 rounded-3xl text-left transition-all flex items-center gap-5 group bg-slate-100/70 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500`}>
                 <div className={`w-14 h-14 rounded-2xl bg-${color}-500/10 text-${color}-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-xl shadow-black/20`}>
                     <i className={`fas ${icon}`}></i>
                 </div>
@@ -478,21 +577,33 @@
             const [isAnswering, setIsAnswering] = useState(false);
             const [feedback, setFeedback] = useState(null);
             const [streak, setStreak] = useState(0);
+            const [internalGameType, setInternalGameType] = useState(type === 'advanced' ? 'recognition' : type);
 
             const generateQuestion = () => {
+                let currentQuestionType = type;
+                if (type === 'advanced') {
+                    const types = ['recognition', 'mastery', 'pallet'];
+                    currentQuestionType = types[Math.floor(Math.random() * types.length)];
+                    setInternalGameType(currentQuestionType);
+                }
+
                 const correct = filteredData[Math.floor(Math.random() * filteredData.length)];
                 let choices = [];
 
-                if (type === 'pallet') {
+                if (currentQuestionType === 'pallet') {
                     const isLayerQ = Math.random() > 0.5;
                     const layers = Math.floor(Math.random() * 4) + 1;
                     const correctVal = isLayerQ ? (correct.cpl * layers) : correct.cpp;
 
+                    const wrongOption1 = correctVal + (correct.cpl || 10);
+                    const wrongOption2 = Math.max(1, correctVal - (correct.cpl || 5));
+                    const wrongOption3 = Math.round(correctVal * (Math.random() > 0.5 ? 1.5 : 0.5));
+
                     choices = [
                         { id: 1, val: correctVal, isCorrect: true },
-                        { id: 2, val: correctVal + (correct.cpl || 10), isCorrect: false },
-                        { id: 3, val: correctVal - 5, isCorrect: false },
-                        { id: 4, val: Math.round(correctVal * 0.5), isCorrect: false }
+                        { id: 2, val: wrongOption1, isCorrect: false },
+                        { id: 3, val: wrongOption2, isCorrect: false },
+                        { id: 4, val: wrongOption3, isCorrect: false }
                     ].sort(() => Math.random() - 0.5);
 
                     setCurrentQ({ ...correct, qTitle: isLayerQ ? `${layers} Layers of ${correct.name}` : `Full Pallet: ${correct.name}` });
@@ -526,11 +637,16 @@
             const handleAnswer = (choice) => {
                 if (isAnswering) return;
                 setIsAnswering(true);
-                setTotal(prev => prev + 1);
+                if (type !== 'marathon') {
+                    setTotal(prev => prev + 1);
+                }
 
-                const isCorrect = type === 'pallet' ? (choice && choice.isCorrect) : (choice && choice.id === currentQ.id);
+                const isCorrect = internalGameType === 'pallet' ? (choice && choice.isCorrect) : (choice && choice.id === currentQ.id);
 
                 if (isCorrect) {
+                    if (type === 'marathon') {
+                        setTotal(prev => prev + 1);
+                    }
                     const basePoints = 10 * difficulty.multiplier;
                     const speedBonus = Math.round((timeLeft / 10) * difficulty.multiplier);
                     const streakBonus = Math.floor(streak / 2) * difficulty.multiplier;
@@ -540,11 +656,19 @@
                 } else {
                     setStreak(0);
                     setFeedback('wrong');
+                    if (type === 'marathon') {
+                        setTimeout(() => onFinish(), 800);
+                        return;
+                    }
                 }
 
                 setTimeout(() => {
-                    if (total + 1 >= 10) onFinish();
-                    else generateQuestion();
+                    if (type !== 'marathon' && total + 1 >= 10) {
+                        onFinish();
+                    }
+                    else {
+                        generateQuestion();
+                    }
                 }, 800);
             };
 
@@ -555,7 +679,7 @@
                     <div className="flex justify-between items-center px-2">
                         <div className="flex flex-col text-slate-500 dark:text-slate-400 uppercase font-black text-[10px] tracking-widest">
                             <span className="text-red-500 font-black tracking-tighter">{difficulty.name} Mode / {category}</span>
-                            <span className="text-slate-900 dark:text-white text-lg">{total + 1} / 10</span>
+                            <span className="text-slate-900 dark:text-white text-lg">{type === 'marathon' ? `Question: ${total + 1}` : `${total + 1} / 10`}</span>
                         </div>
                         <div className="text-right flex flex-col font-black">
                             <span className="text-slate-500 dark:text-slate-400 text-[10px] tracking-widest uppercase">Points</span>
@@ -573,9 +697,9 @@
                     <div className={`p-8 rounded-[2.5rem] text-center border-2 flex flex-col items-center justify-center min-h-[300px] transition-all duration-300 bg-slate-100/70 dark:bg-slate-800/70 backdrop-blur-xl shadow-2xl ${feedback === 'correct' ? 'border-green-500 bg-green-500/10 animate-pulse-green' :
                         feedback === 'wrong' ? 'border-red-500 bg-red-500/10' : 'border-slate-700 shadow-2xl'
                         }`}>
-                        {type === 'recognition' && <img src={currentQ.image} className="product-image mb-4" />}
-                        {type === 'mastery' && <h2 className="text-3xl font-black uppercase tracking-tighter italic leading-tight">{currentQ.name}</h2>}
-                        {type === 'pallet' && (
+                        {internalGameType === 'recognition' && <img src={currentQ.image} className="product-image mb-4" />}
+                        {internalGameType === 'mastery' && <h2 className="text-3xl font-black uppercase tracking-tighter italic leading-tight">{currentQ.name}</h2>}
+                        {internalGameType === 'pallet' && (
                             <div className="p-3 bg-slate-200/50 dark:bg-slate-900/50 rounded-2xl border border-slate-300 dark:border-slate-700 w-full">
                                 <h2 className="text-xl font-black uppercase tracking-tight leading-tight">{currentQ.qTitle}</h2>
                             </div>
@@ -589,13 +713,13 @@
                                 key={i}
                                 onClick={() => handleAnswer(opt)}
                                 disabled={isAnswering}
-                                className={`p-4 rounded-3xl font-black text-xs leading-tight border-2 transition-all min-h-[80px] shadow-lg active:translate-y-1 ${isAnswering && (type === 'pallet' ? opt.isCorrect : opt.id === currentQ.id)
+                                className={`p-4 rounded-3xl font-black text-xs leading-tight border-2 transition-all min-h-[80px] shadow-lg active:translate-y-1 ${isAnswering && (internalGameType === 'pallet' ? opt.isCorrect : opt.id === currentQ.id)
                                     ? 'bg-green-500 border-green-400 text-white scale-105 z-10'
                                     : isAnswering && feedback === 'wrong' ? 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-700'
                                         : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 active:bg-slate-200 dark:active:bg-slate-700'
                                     }`}
                             >
-                                {type === 'pallet' ? opt.val : (type === 'recognition' ? opt.name : opt.code)}
+                                {internalGameType === 'pallet' ? opt.val : (internalGameType === 'recognition' ? opt.name : opt.code)}
                             </button>
                         ))}
                     </div>
