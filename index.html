@@ -309,6 +309,7 @@
             const [totalAttempted, setTotalAttempted] = useState(0);
             const [highScore, setHighScore] = useState(localStorage.getItem('ccbsa_highscore') || 0);
             const [theme, setTheme] = useState('dark');
+            const [marathonSettings, setMarathonSettings] = useState({ numQuestions: 25 });
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [modalContent, setModalContent] = useState({ title: '', message: '', onConfirm: () => { } });
 
@@ -346,12 +347,23 @@
                         }
                     });
                     setIsModalOpen(true);
+                } else if (mode === 'marathon') {
+                    setGameMode(mode);
+                    setView('marathonSetup');
                 } else {
                     setGameMode(mode);
                     setView('selectDifficulty');
                 }
             };
             const selectDifficulty = (diff) => { setDifficulty(diff); setView('selectCategory'); };
+            const startMarathon = (settings) => {
+                setDifficulty(settings.difficulty);
+                setSelectedCategory(settings.category);
+                setMarathonSettings({ numQuestions: settings.numQuestions });
+                setScore(0);
+                setTotalAttempted(0);
+                setView('marathon');
+            };
             const startGame = (category) => { setSelectedCategory(category); setScore(0); setTotalAttempted(0); setView(gameMode); };
             const finishGame = () => { updateHighScore(score); setView('results'); };
             const goMenu = () => setView('menu');
@@ -388,12 +400,14 @@
                         {view === 'menu' && <Menu onSelectMode={selectMode} onShowAbout={showAbout} highScore={highScore} />}
                         {view === 'selectDifficulty' && <DifficultySelect onSelectDifficulty={selectDifficulty} />}
                         {view === 'about' && <About onBack={goMenu} />}
+                        {view === 'marathonSetup' && <MarathonSetup onStartMarathon={startMarathon} />}
                         {view === 'selectCategory' && <CategorySelect onSelectCategory={startGame} />}
-                        {(view === 'recognition' || view === 'mastery' || view === 'pallet') && (
+                        {(view === 'recognition' || view === 'mastery' || view === 'pallet' || view === 'advanced' || view === 'marathon') && (
                             <Game
                                 type={gameMode}
                                 category={selectedCategory}
                                 difficulty={difficulty}
+                                marathonSettings={marathonSettings}
                                 onFinish={finishGame}
                                 setScore={setScore}
                                 score={score}
@@ -565,7 +579,67 @@
             </div>
         );
 
-        const Game = ({ type, category, difficulty, onFinish, setScore, score, setTotal, total }) => {
+        const MarathonSetup = ({ onStartMarathon }) => {
+            const [numQuestions, setNumQuestions] = useState(25);
+            const [difficulty, setDifficulty] = useState(DIFFICULTIES[1]);
+            const [category, setCategory] = useState(CATEGORIES[0]);
+
+            const handleStart = () => {
+                onStartMarathon({ numQuestions, difficulty, category });
+            };
+
+            const questionOptions = [25, 50, 100];
+
+            return (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8 pb-10">
+                    <div>
+                        <h2 className="text-2xl font-black mb-4 flex items-center gap-3 uppercase tracking-tighter">
+                            <i className="fas fa-road text-purple-500"></i>
+                            Marathon Setup
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Configure your endurance drill.</p>
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-bold mb-3 uppercase tracking-wider text-slate-600 dark:text-slate-300">Questions</h3>
+                        <div className="grid grid-cols-3 gap-3">
+                            {questionOptions.map(num => (
+                                <button key={num} onClick={() => setNumQuestions(num)} className={`p-4 rounded-2xl font-bold text-center transition-colors ${numQuestions === num ? 'coke-red text-white' : 'bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700'}`}>
+                                    {num}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-bold mb-3 uppercase tracking-wider text-slate-600 dark:text-slate-300">Intensity</h3>
+                        <div className="grid gap-4">
+                            {DIFFICULTIES.map((diff) => (
+                                <button key={diff.id} onClick={() => setDifficulty(diff)} className={`p-4 rounded-2xl text-left transition-all border-l-4 flex justify-between items-center group ${difficulty.id === diff.id ? 'border-red-500 bg-slate-200 dark:bg-slate-700' : 'border-transparent bg-slate-100/70 dark:bg-slate-800/70 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                                    <div>
+                                        <span className="font-black text-lg block uppercase tracking-tighter">{diff.name}</span>
+                                    </div>
+                                    <div className="font-black text-slate-500">{diff.multiplier}x</div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-bold mb-3 uppercase tracking-wider text-slate-600 dark:text-slate-300">Zone</h3>
+                        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-4 rounded-2xl bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 border font-bold text-slate-800 dark:text-slate-200">
+                            {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </select>
+                    </div>
+
+                    <button onClick={handleStart} className="w-full coke-red text-white p-5 rounded-[2rem] font-black text-xl shadow-xl shadow-red-500/20 hover:scale-[1.02] transition-transform">
+                        START MARATHON
+                    </button>
+                </div>
+            );
+        };
+
+        const Game = ({ type, category, difficulty, marathonSettings, onFinish, setScore, score, setTotal, total }) => {
             const filteredData = useMemo(() => {
                 if (category === "All Products") return PRODUCT_DATA;
                 return PRODUCT_DATA.filter(p => p.category === category);
@@ -637,16 +711,11 @@
             const handleAnswer = (choice) => {
                 if (isAnswering) return;
                 setIsAnswering(true);
-                if (type !== 'marathon') {
-                    setTotal(prev => prev + 1);
-                }
+                setTotal(prev => prev + 1);
 
                 const isCorrect = internalGameType === 'pallet' ? (choice && choice.isCorrect) : (choice && choice.id === currentQ.id);
 
                 if (isCorrect) {
-                    if (type === 'marathon') {
-                        setTotal(prev => prev + 1);
-                    }
                     const basePoints = 10 * difficulty.multiplier;
                     const speedBonus = Math.round((timeLeft / 10) * difficulty.multiplier);
                     const streakBonus = Math.floor(streak / 2) * difficulty.multiplier;
@@ -656,17 +725,13 @@
                 } else {
                     setStreak(0);
                     setFeedback('wrong');
-                    if (type === 'marathon') {
-                        setTimeout(() => onFinish(), 800);
-                        return;
-                    }
                 }
 
                 setTimeout(() => {
-                    if (type !== 'marathon' && total + 1 >= 10) {
+                    const limit = type === 'marathon' ? marathonSettings.numQuestions : 10;
+                    if (total + 1 >= limit) {
                         onFinish();
-                    }
-                    else {
+                    } else {
                         generateQuestion();
                     }
                 }, 800);
@@ -679,7 +744,7 @@
                     <div className="flex justify-between items-center px-2">
                         <div className="flex flex-col text-slate-500 dark:text-slate-400 uppercase font-black text-[10px] tracking-widest">
                             <span className="text-red-500 font-black tracking-tighter">{difficulty.name} Mode / {category}</span>
-                            <span className="text-slate-900 dark:text-white text-lg">{type === 'marathon' ? `Question: ${total + 1}` : `${total + 1} / 10`}</span>
+                            <span className="text-slate-900 dark:text-white text-lg">{type === 'marathon' ? `${total + 1} / ${marathonSettings.numQuestions}` : `${total + 1} / 10`}</span>
                         </div>
                         <div className="text-right flex flex-col font-black">
                             <span className="text-slate-500 dark:text-slate-400 text-[10px] tracking-widest uppercase">Points</span>
