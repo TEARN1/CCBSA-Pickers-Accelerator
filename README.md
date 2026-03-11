@@ -4,4 +4,7 @@ This is a **High-Velocity Training Engine** designed to optimize human capital i
 
 ## Tech Stack
 
+- **Frontend:** React, Tailwind CSS, JavaScript (ES6+), HTML5, CSS3
+- **Libraries:** Font Awesome
+- **Tooling:** Babel (for in-browser JSX transpilation)
 ---
